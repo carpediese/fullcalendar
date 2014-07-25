@@ -624,7 +624,6 @@ function AgendaView(element, calendar, viewName) {
 	-----------------------------------------------------------------------------*/
 	function renderDroppableZones(droppableZones) {
 		var html = '';
-		t.droppableZones = droppableZones;
 		for (i=0; i < droppableZones.length; i++) {
 			var zone = droppableZones[i];
 			
@@ -687,7 +686,6 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	function clearDroppableZones() {
-	    t.droppableZones = [];
 	    droppableZoneSegmentContainer[0].innerHTML = '';
 	}
 	

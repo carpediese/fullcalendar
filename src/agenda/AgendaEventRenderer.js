@@ -44,7 +44,7 @@ function AgendaEventRenderer() {
 	var calendar = t.calendar;
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
-
+	var isInDroppableZone = calendar.isInDroppableZone;
 
 	// overrides
 	t.draggableDayEvent = draggableDayEvent;
@@ -524,7 +524,7 @@ function AgendaEventRenderer() {
 				// PS- the problem exists for draggableDayEvent() when dragging an all-day event to a slot event.
 				// We should overhaul the dragging system and stop relying on jQuery UI.
 				var cell = coordinateGrid.cell(ev.pageX, ev.pageY);
-				
+
 				// update states
 				isInBounds = !!cell;
 				if (isInBounds) {
@@ -577,7 +577,7 @@ function AgendaEventRenderer() {
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				
-				var inDroppableZone = isInDroppableZone(dayDelta, minuteDelta);
+				var inDroppableZone = isInDroppableZone(finalTimeEvent(dayDelta, minuteDelta));
 
 				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
@@ -632,46 +632,13 @@ function AgendaEventRenderer() {
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
 		
-		function isInDroppableZone(dayDelta, minuteDelta) {
-			
-			if (t.droppableZones.length > 0) {
-				var start = addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta);
-				var end = addMinutes(addDays(slotEventEnd(event), dayDelta, true), minuteDelta);
-				
-				for (var i = 0; i < t.droppableZones.length; i++) {
-					
-					var zone = t.droppableZones[i];
-					var zoneStart = cloneDate(zone.start);
-					var zoneEnd = cloneDate(zone.end);
-					
-					if (zone.weekly) {
-						var diff = dayDiff(t.visStart, zoneStart);
-						var weekDiff = diff - (diff % 7) ;
-						weekDiff = (diff > 0) ? weekDiff+7 : weekDiff ;
-				
-						zoneStart = addDays( zoneStart, weekDiff, true);
-						zoneEnd = addDays( zoneEnd, weekDiff, true);
-					}
-					
-					
-					if (
-						start >= zoneStart &&
-						start <= zoneEnd &&
-						end >= zoneStart &&
-						end <= zoneEnd
-					) {
-						return true ;
-					}
-				}
-				return false;
-			} else {
-				return true;
-			}
+		function finalTimeEvent(dayDelta, minuteDelta) {
+			return {
+				start : addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta),
+				end : 	addMinutes(addDays(slotEventEnd(event), dayDelta, true), minuteDelta)
+			};
 		}
-
 	}
-	
-	
 	
 	/* Resizing
 	--------------------------------------------------------------------------------------*/

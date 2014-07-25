@@ -28,7 +28,7 @@ function Calendar(element, options, eventSources) {
 	t.getView = getView;
 	t.option = option;
 	t.trigger = trigger;
-	
+	t.isInDroppableZone = isInDroppableZone;
 	
 	// imports
 	EventManager.call(t, options, eventSources);
@@ -508,7 +508,45 @@ function Calendar(element, options, eventSources) {
 		}
 	}
 	
-	
+	function isInDroppableZone(event) {
+		
+		if (droppableZones.length > 0) {
+			
+			var start = event.start;
+			var end = event.end;
+			if (!end) {
+				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
+			}
+			
+			for (var i = 0; i < droppableZones.length; i++) {
+				
+				var zone = droppableZones[i];
+				var zoneStart = cloneDate(zone.start);
+				var zoneEnd = cloneDate(zone.end);
+				
+				if (zone.weekly) {
+					var diff = dayDiff(start, zoneStart);
+					var weekDiff = diff - (diff % 7) ;
+					weekDiff = (diff < 0) ? weekDiff-7 : weekDiff ;
+			
+					zoneStart = addDays( zoneStart, weekDiff, true);
+					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					start >= zoneStart &&
+					start <= zoneEnd &&
+					end >= zoneStart &&
+					end <= zoneEnd
+				) {
+					return true ;
+				}
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
 	
 	/* External Dragging
 	------------------------------------------------------------------------*/
