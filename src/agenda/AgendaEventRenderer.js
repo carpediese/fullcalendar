@@ -636,12 +636,17 @@ function AgendaEventRenderer() {
 			
 			if (t.droppableZones.length > 0) {
 				var start = addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta);
-				var end = addMinutes(addDays(cloneDate(event.end), dayDelta, true), minuteDelta);
+				var end = addMinutes(addDays(slotEventEnd(event), dayDelta, true), minuteDelta);
 				
 				for (var i = 0; i < t.droppableZones.length; i++) {
 					
 					var zone = t.droppableZones[i];
-					if (start >= zone.start && end <= zone.end) {
+					if (
+						start >= zone.start &&
+						start <= zone.end &&
+						end >= zone.start &&
+						end <= zone.end
+					) {
 						return true ;
 					}
 				}
