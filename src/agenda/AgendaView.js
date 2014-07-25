@@ -43,6 +43,7 @@ function AgendaView(element, calendar, viewName) {
 	t.colContentRight = colContentRight;
 	t.getDaySegmentContainer = function() { return daySegmentContainer };
 	t.getSlotSegmentContainer = function() { return slotSegmentContainer };
+	t.getDroppableZoneSegmentContainer = function() { return droppableZoneSegmentContainer };
 	t.getMinMinute = function() { return minMinute };
 	t.getMaxMinute = function() { return maxMinute };
 	t.getSlotContainer = function() { return slotContainer };
@@ -58,7 +59,8 @@ function AgendaView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
-	
+	t.renderDroppableZones = renderDroppableZones;
+	t.clearDroppableZones = clearDroppableZones;
 	
 	// imports
 	View.call(t, element, calendar, viewName);
@@ -235,6 +237,10 @@ function AgendaView(element, calendar, viewName) {
 				
 		slotSegmentContainer =
 			$("<div class='fc-event-container' style='position:absolute;z-index:8;top:0;left:0'/>")
+				.appendTo(slotContainer);
+		
+		droppableZoneSegmentContainer =
+			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
 				.appendTo(slotContainer);
 		
 		s =
@@ -612,6 +618,53 @@ function AgendaView(element, calendar, viewName) {
 		}
 	}
 	
+	
+	
+	/* Render droppable slots
+	-----------------------------------------------------------------------------*/
+	function renderDroppableZones(droppableZones) {
+		var html = '';
+		t.doppableArea = droppableZones;
+		for (i=0; i < droppableZones.length; i++) {
+			var zone = droppableZones[i];
+			if (zone.start >= this.start && zone.end <= this.end) {
+				var top = timePosition(zone.start, zone.start);
+				var bottom = timePosition(zone.end, zone.end);
+				var height = bottom - top;
+				var dayIndex = dayDiff(zone.start, t.visStart);
+				
+				var left = colContentLeft(dayIndex) - 2;
+				var right = colContentRight(dayIndex) + 3;
+				var width = right - left;
+
+				var cls = '';
+				if (zone.cls) {
+					cls = ' ' + zone.cls;
+				}
+
+				var background = 'background: #aaeeaa ;';
+				if (zone.background) {
+					background = 'background:' + zone.background + ';';
+				}
+				
+				html += '<div style="position: absolute; ' + 
+					'top: ' + top + 'px; ' + 
+					'left: ' + left + 'px; ' +
+					'width: ' + width + 'px; ' +
+					'height: ' + height + 'px;' + background + '" ' + 
+					'class="fc-droppable-zone' + cls + '">' + 
+					'</div>';
+				
+//				t.doppableArea.push({ top:top, left:left, width:width, height:height });
+			}
+		}
+		droppableZoneSegmentContainer[0].innerHTML = html;
+	}
+	
+	function clearDroppableZones() {
+	    t.doppableArea = [];
+	    droppableZoneSegmentContainer[0].innerHTML = '';
+	}
 	
 	
 	/* Coordinate Utilities

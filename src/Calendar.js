@@ -50,7 +50,7 @@ function Calendar(element, options, eventSources) {
 	var date = new Date();
 	var events = [];
 	var _dragElement;
-	
+	var droppableZones = t.options.droppableZones;
 	
 	
 	/* Main Rendering
@@ -311,6 +311,7 @@ function Calendar(element, options, eventSources) {
 		if (elementVisible()) {
 			currentView.setEventData(events); // for View.js, TODO: unify with renderEvents
 			currentView.renderEvents(events, modifiedEventID); // actually render the DOM elements
+			currentView.renderDroppableZones(droppableZones);
 			currentView.trigger('eventAfterAllRender');
 		}
 	}
@@ -320,6 +321,7 @@ function Calendar(element, options, eventSources) {
 		currentView.triggerEventDestroy(); // trigger 'eventDestroy' for each event
 		currentView.clearEvents(); // actually remove the DOM elements
 		currentView.clearEventData(); // for View.js, TODO: unify with clearEvents
+		currentView.clearDroppableZones(droppableZones);
 	}
 	
 

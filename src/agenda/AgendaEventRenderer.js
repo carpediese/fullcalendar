@@ -524,15 +524,19 @@ function AgendaEventRenderer() {
 				// PS- the problem exists for draggableDayEvent() when dragging an all-day event to a slot event.
 				// We should overhaul the dragging system and stop relying on jQuery UI.
 				var cell = coordinateGrid.cell(ev.pageX, ev.pageY);
-
+				
 				// update states
 				isInBounds = !!cell;
 				if (isInBounds) {
+					
+					// IN THE CALENDAR
+					
 					isAllDay = getIsCellAllDay(cell);
 
 					// calculate column delta
 					colDelta = Math.round((ui.position.left - origPosition.left) / colWidth);
 					if (colDelta != prevColDelta) {
+						
 						// calculate the day delta based off of the original clicked column and the column delta
 						var origDate = cellToDate(0, origCell.col);
 						var col = origCell.col + colDelta;
@@ -555,7 +559,6 @@ function AgendaEventRenderer() {
 					colDelta != prevColDelta ||
 					minuteDelta != prevMinuteDelta
 				) {
-
 					updateUI();
 
 					// update previous states for next time
@@ -573,8 +576,10 @@ function AgendaEventRenderer() {
 
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
+				
+				var inDroppableArea = isInDroppableArea(dayDelta, minuteDelta);
 
-				if (isInBounds && (isAllDay || dayDelta || minuteDelta)) { // changed!
+				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableArea) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
 				}
 				else { // either no change or out-of-bounds (draggable has already reverted)
@@ -625,6 +630,25 @@ function AgendaEventRenderer() {
 				newEnd = addMinutes(cloneDate(event.end), minuteDelta);
 			}
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
+		}
+		
+		function isInDroppableArea(dayDelta, minuteDelta) {
+			
+			if (t.doppableArea.length > 0) {
+				var start = addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta);
+				var end = addMinutes(addDays(cloneDate(event.end), dayDelta, true), minuteDelta);
+				
+				for (var i = 0; i < t.doppableArea.length; i++) {
+					
+					var area = t.doppableArea[i];
+					if (start >= area.start && end <= area.end) {
+						return true ;
+					}
+				}
+				return false;
+			} else {
+				return true;
+			}
 		}
 
 	}
