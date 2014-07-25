@@ -31,6 +31,8 @@ function BasicView(element, calendar, viewName) {
 	t.getColCnt = function() { return colCnt };
 	t.getColWidth = function() { return colWidth };
 	t.getDaySegmentContainer = function() { return daySegmentContainer };
+	t.renderDroppableZones = function(){};
+	t.clearDroppableZones = function(){};
 	
 	
 	// imports

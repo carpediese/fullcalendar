@@ -627,37 +627,64 @@ function AgendaView(element, calendar, viewName) {
 		t.droppableZones = droppableZones;
 		for (i=0; i < droppableZones.length; i++) {
 			var zone = droppableZones[i];
-			if (zone.start >= this.start && zone.end <= this.end) {
-				var top = timePosition(zone.start, zone.start);
-				var bottom = timePosition(zone.end, zone.end);
-				var height = bottom - top;
-				var dayIndex = dayDiff(zone.start, t.visStart);
+			
+			var start = cloneDate(zone.start);
+			var end = cloneDate(zone.end);
+			
+			if (zone.weekly) {
+				var diff = dayDiff(t.visStart, start);
+				var weekDiff = diff - (diff % 7) ;
+				weekDiff = (diff > 0) ? weekDiff+7 : weekDiff ;
 				
-				var left = colContentLeft(dayIndex) - 2;
-				var right = colContentRight(dayIndex) + 3;
-				var width = right - left;
+				start = addDays( start, weekDiff, true);
+				end = addDays( end, weekDiff, true);
+			}
 
-				var cls = '';
-				if (zone.cls) {
-					cls = ' ' + zone.cls;
-				}
-
-				var background = 'background: #aaeeaa ;';
-				if (zone.background) {
-					background = 'background:' + zone.background + ';';
-				}
-				
-				html += '<div style="position: absolute; ' + 
-					'top: ' + top + 'px; ' + 
-					'left: ' + left + 'px; ' +
-					'width: ' + width + 'px; ' +
-					'height: ' + height + 'px;' + background + '" ' + 
-					'class="fc-droppable-zone' + cls + '">' + 
-					'</div>';
+			if (start >= this.start && end <= this.end) {
+				html += getZoneHtml(zone, start, end);
 			}
 		}
 		droppableZoneSegmentContainer[0].innerHTML = html;
 	}
+	
+	function getZoneHtml(zone, start, end) {
+		
+		if (!start) {
+			start = zone.start;
+		}
+		if (!end) {
+			end = zone.end;
+		}
+		
+		var top = timePosition(start, start);
+		var bottom = timePosition(end, end);
+		var height = bottom - top;
+		var dayIndex = dayDiff(start, t.visStart);
+		
+		var left = colContentLeft(dayIndex) - 2;
+		var right = colContentRight(dayIndex) + 3;
+		var width = right - left;
+
+		var cls = '';
+		if (zone.cls) {
+			cls = ' ' + zone.cls;
+		}
+
+		var background = 'background: #aaeeaa ;';
+		if (zone.background) {
+			background = 'background:' + zone.background + ';';
+		}
+		
+		return '<div style="position: absolute; ' + 
+			'top: ' + top + 'px; ' + 
+			'left: ' + left + 'px; ' +
+			'width: ' + width + 'px; ' +
+			'height: ' + height + 'px;' + background + '" ' + 
+			'class="fc-droppable-zone' + cls + '">' + 
+			'</div>';
+		
+	}
+	
 	
 	function clearDroppableZones() {
 	    t.droppableZones = [];
