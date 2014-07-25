@@ -535,8 +535,7 @@ function Calendar(element, options, eventSources) {
 				if (zone.weekly) {
 					var diff = dayDiff(start, zoneStart);
 					var weekDiff = diff - (diff % 7) ;
-					weekDiff = (diff < 0) ? weekDiff-7 : weekDiff ;
-			
+					
 					zoneStart = addDays( zoneStart, weekDiff, true);
 					zoneEnd = addDays( zoneEnd, weekDiff, true);
 				}
@@ -575,7 +574,6 @@ function Calendar(element, options, eventSources) {
 				if (zone.weekly) {
 					var diff = dayDiff(start, zoneStart);
 					var weekDiff = diff - (diff % 7) ;
-					weekDiff = (diff < 0) ? weekDiff-7 : weekDiff ;
 			
 					zoneStart = addDays( zoneStart, weekDiff, true);
 					zoneEnd = addDays( zoneEnd, weekDiff, true);
