@@ -577,9 +577,9 @@ function AgendaEventRenderer() {
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				
-				var inDroppableArea = isInDroppableArea(dayDelta, minuteDelta);
+				var inDroppableZone = isInDroppableZone(dayDelta, minuteDelta);
 
-				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableArea) { // changed!
+				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
 				}
 				else { // either no change or out-of-bounds (draggable has already reverted)
@@ -632,16 +632,16 @@ function AgendaEventRenderer() {
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
 		
-		function isInDroppableArea(dayDelta, minuteDelta) {
+		function isInDroppableZone(dayDelta, minuteDelta) {
 			
-			if (t.doppableArea.length > 0) {
+			if (t.droppableZones.length > 0) {
 				var start = addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta);
 				var end = addMinutes(addDays(cloneDate(event.end), dayDelta, true), minuteDelta);
 				
-				for (var i = 0; i < t.doppableArea.length; i++) {
+				for (var i = 0; i < t.droppableZones.length; i++) {
 					
-					var area = t.doppableArea[i];
-					if (start >= area.start && end <= area.end) {
+					var zone = t.droppableZones[i];
+					if (start >= zone.start && end <= zone.end) {
 						return true ;
 					}
 				}

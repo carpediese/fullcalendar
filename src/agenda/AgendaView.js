@@ -624,7 +624,7 @@ function AgendaView(element, calendar, viewName) {
 	-----------------------------------------------------------------------------*/
 	function renderDroppableZones(droppableZones) {
 		var html = '';
-		t.doppableArea = droppableZones;
+		t.droppableZones = droppableZones;
 		for (i=0; i < droppableZones.length; i++) {
 			var zone = droppableZones[i];
 			if (zone.start >= this.start && zone.end <= this.end) {
@@ -654,15 +654,13 @@ function AgendaView(element, calendar, viewName) {
 					'height: ' + height + 'px;' + background + '" ' + 
 					'class="fc-droppable-zone' + cls + '">' + 
 					'</div>';
-				
-//				t.doppableArea.push({ top:top, left:left, width:width, height:height });
 			}
 		}
 		droppableZoneSegmentContainer[0].innerHTML = html;
 	}
 	
 	function clearDroppableZones() {
-	    t.doppableArea = [];
+	    t.droppableZones = [];
 	    droppableZoneSegmentContainer[0].innerHTML = '';
 	}
 	
