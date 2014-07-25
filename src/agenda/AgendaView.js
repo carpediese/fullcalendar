@@ -61,6 +61,8 @@ function AgendaView(element, calendar, viewName) {
 	t.dragStop = dragStop;
 	t.renderDroppableZones = renderDroppableZones;
 	t.clearDroppableZones = clearDroppableZones;
+	t.renderUndroppableZones = renderUndroppableZones;
+	t.clearUndroppableZones = clearUndroppableZones;
 	
 	// imports
 	View.call(t, element, calendar, viewName);
@@ -240,6 +242,10 @@ function AgendaView(element, calendar, viewName) {
 				.appendTo(slotContainer);
 		
 		droppableZoneSegmentContainer =
+			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
+				.appendTo(slotContainer);
+
+		undroppableZoneSegmentContainer =
 			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
 				.appendTo(slotContainer);
 		
@@ -646,6 +652,30 @@ function AgendaView(element, calendar, viewName) {
 		droppableZoneSegmentContainer[0].innerHTML = html;
 	}
 	
+	function renderUndroppableZones(undroppableZones) {
+		var html = '';
+		for (i=0; i < undroppableZones.length; i++) {
+			var zone = undroppableZones[i];
+			
+			var start = cloneDate(zone.start);
+			var end = cloneDate(zone.end);
+			
+			if (zone.weekly) {
+				var diff = dayDiff(t.visStart, start);
+				var weekDiff = diff - (diff % 7) ;
+				weekDiff = (diff > 0) ? weekDiff+7 : weekDiff ;
+				
+				start = addDays( start, weekDiff, true);
+				end = addDays( end, weekDiff, true);
+			}
+
+			if (start >= this.start && end <= this.end) {
+				html += getZoneHtml(zone, start, end);
+			}
+		}
+		undroppableZoneSegmentContainer[0].innerHTML = html;
+	}
+	
 	function getZoneHtml(zone, start, end) {
 		
 		if (!start) {
@@ -689,6 +719,9 @@ function AgendaView(element, calendar, viewName) {
 	    droppableZoneSegmentContainer[0].innerHTML = '';
 	}
 	
+	function clearUndroppableZones() {
+	    undroppableZoneSegmentContainer[0].innerHTML = '';
+	}
 	
 	/* Coordinate Utilities
 	-----------------------------------------------------------------------------*/

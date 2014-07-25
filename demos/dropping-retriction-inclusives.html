@@ -110,6 +110,21 @@
 					background: '#bbeebb'
 				}
 			],
+			
+			undroppableZones: [
+				{
+					start: new Date(y, m, d - 1, 13, 0),
+					end: new Date(y, m, d - 1, 14, 30),
+					background: '#eebbbb',
+					weekly: true
+				},
+				{
+					start: new Date(y, m, d, 19, 0),
+					end: new Date(y, m, d, 20, 00),
+					background: '#eebbbb'
+				}
+			],
+			
 			droppable: true, // this allows things to be dropped onto the calendar !!!
 			drop: function(date, allDay) { // this function is called when something is dropped
 			
@@ -125,10 +140,7 @@
 				
 				// render the event on the calendar
 				// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
-				console.log('copiedEventObject');
-				console.log(copiedEventObject);
-				
-				var accept = $('#calendar').fullCalendar('isInDroppableZone', copiedEventObject);
+				var accept = $('#calendar').fullCalendar('authorizedToDrop', copiedEventObject);
 				if( accept ) {
 					$('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
 				

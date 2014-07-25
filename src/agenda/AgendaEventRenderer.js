@@ -44,7 +44,7 @@ function AgendaEventRenderer() {
 	var calendar = t.calendar;
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
-	var isInDroppableZone = calendar.isInDroppableZone;
+	var authorizedToDrop = calendar.authorizedToDrop;
 
 	// overrides
 	t.draggableDayEvent = draggableDayEvent;
@@ -577,7 +577,7 @@ function AgendaEventRenderer() {
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				
-				var inDroppableZone = isInDroppableZone(finalTimeEvent(dayDelta, minuteDelta));
+				var inDroppableZone = authorizedToDrop(finalTimeEvent(dayDelta, minuteDelta));
 
 				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);

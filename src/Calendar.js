@@ -29,6 +29,8 @@ function Calendar(element, options, eventSources) {
 	t.option = option;
 	t.trigger = trigger;
 	t.isInDroppableZone = isInDroppableZone;
+	t.isInSealedZone = isInSealedZone;
+	t.authorizedToDrop = authorizedToDrop;
 	
 	// imports
 	EventManager.call(t, options, eventSources);
@@ -51,7 +53,7 @@ function Calendar(element, options, eventSources) {
 	var events = [];
 	var _dragElement;
 	var droppableZones = t.options.droppableZones;
-	
+	var undroppableZones = t.options.undroppableZones;
 	
 	/* Main Rendering
 	-----------------------------------------------------------------------------*/
@@ -312,6 +314,7 @@ function Calendar(element, options, eventSources) {
 			currentView.setEventData(events); // for View.js, TODO: unify with renderEvents
 			currentView.renderEvents(events, modifiedEventID); // actually render the DOM elements
 			currentView.renderDroppableZones(droppableZones);
+			currentView.renderUndroppableZones(undroppableZones);
 			currentView.trigger('eventAfterAllRender');
 		}
 	}
@@ -321,7 +324,8 @@ function Calendar(element, options, eventSources) {
 		currentView.triggerEventDestroy(); // trigger 'eventDestroy' for each event
 		currentView.clearEvents(); // actually remove the DOM elements
 		currentView.clearEventData(); // for View.js, TODO: unify with clearEvents
-		currentView.clearDroppableZones(droppableZones);
+		currentView.clearDroppableZones();
+		currentView.clearUndroppableZones();
 	}
 	
 
@@ -508,6 +512,10 @@ function Calendar(element, options, eventSources) {
 		}
 	}
 	
+	function authorizedToDrop(event) {
+		return isInDroppableZone(event) && !isInSealedZone(event) ;
+	}
+	
 	function isInDroppableZone(event) {
 		
 		if (droppableZones.length > 0) {
@@ -546,6 +554,43 @@ function Calendar(element, options, eventSources) {
 		} else {
 			return true;
 		}
+	}
+	
+	function isInSealedZone(event) {
+		
+		if (undroppableZones.length > 0) {
+			
+			var start = event.start;
+			var end = event.end;
+			if (!end) {
+				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
+			}
+			
+			for (var i = 0; i < undroppableZones.length; i++) {
+				
+				var zone = undroppableZones[i];
+				var zoneStart = cloneDate(zone.start);
+				var zoneEnd = cloneDate(zone.end);
+				
+				if (zone.weekly) {
+					var diff = dayDiff(start, zoneStart);
+					var weekDiff = diff - (diff % 7) ;
+					weekDiff = (diff < 0) ? weekDiff-7 : weekDiff ;
+			
+					zoneStart = addDays( zoneStart, weekDiff, true);
+					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					(start >= zoneStart && start < zoneEnd)  ||
+					(end > zoneStart && end <= zoneEnd) ||
+					(start <= zoneStart && end >= zoneEnd)
+				) {
+					return true ;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/* External Dragging
