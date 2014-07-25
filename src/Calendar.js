@@ -28,7 +28,7 @@ function Calendar(element, options, eventSources) {
 	t.getView = getView;
 	t.option = option;
 	t.trigger = trigger;
-	t.isInDroppableZone = isInDroppableZone;
+	t.isInDropZone = isInDropZone;
 	t.isInSealedZone = isInSealedZone;
 	t.authorizedToDrop = authorizedToDrop;
 	
@@ -52,8 +52,8 @@ function Calendar(element, options, eventSources) {
 	var date = new Date();
 	var events = [];
 	var _dragElement;
-	var droppableZones = t.options.droppableZones;
-	var undroppableZones = t.options.undroppableZones;
+	var dropZones = t.options.dropZones;
+	var sealedZones = t.options.sealedZones;
 	
 	/* Main Rendering
 	-----------------------------------------------------------------------------*/
@@ -313,8 +313,8 @@ function Calendar(element, options, eventSources) {
 		if (elementVisible()) {
 			currentView.setEventData(events); // for View.js, TODO: unify with renderEvents
 			currentView.renderEvents(events, modifiedEventID); // actually render the DOM elements
-			currentView.renderDroppableZones(droppableZones);
-			currentView.renderUndroppableZones(undroppableZones);
+			currentView.renderDropZones(dropZones);
+			currentView.renderSealedZones(sealedZones);
 			currentView.trigger('eventAfterAllRender');
 		}
 	}
@@ -324,8 +324,8 @@ function Calendar(element, options, eventSources) {
 		currentView.triggerEventDestroy(); // trigger 'eventDestroy' for each event
 		currentView.clearEvents(); // actually remove the DOM elements
 		currentView.clearEventData(); // for View.js, TODO: unify with clearEvents
-		currentView.clearDroppableZones();
-		currentView.clearUndroppableZones();
+		currentView.clearDropZones();
+		currentView.clearSealedZones();
 	}
 	
 
@@ -513,12 +513,12 @@ function Calendar(element, options, eventSources) {
 	}
 	
 	function authorizedToDrop(event) {
-		return isInDroppableZone(event) && !isInSealedZone(event) ;
+		return isInDropZone(event) && !isInSealedZone(event) ;
 	}
 	
-	function isInDroppableZone(event) {
+	function isInDropZone(event) {
 		
-		if (droppableZones.length > 0) {
+		if (dropZones.length > 0) {
 			
 			var start = event.start;
 			var end = event.end;
@@ -526,9 +526,9 @@ function Calendar(element, options, eventSources) {
 				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
 			}
 			
-			for (var i = 0; i < droppableZones.length; i++) {
+			for (var i = 0; i < dropZones.length; i++) {
 				
-				var zone = droppableZones[i];
+				var zone = dropZones[i];
 				var zoneStart = cloneDate(zone.start);
 				var zoneEnd = cloneDate(zone.end);
 				
@@ -558,7 +558,7 @@ function Calendar(element, options, eventSources) {
 	
 	function isInSealedZone(event) {
 		
-		if (undroppableZones.length > 0) {
+		if (sealedZones.length > 0) {
 			
 			var start = event.start;
 			var end = event.end;
@@ -566,9 +566,9 @@ function Calendar(element, options, eventSources) {
 				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
 			}
 			
-			for (var i = 0; i < undroppableZones.length; i++) {
+			for (var i = 0; i < sealedZones.length; i++) {
 				
-				var zone = undroppableZones[i];
+				var zone = sealedZones[i];
 				var zoneStart = cloneDate(zone.start);
 				var zoneEnd = cloneDate(zone.end);
 				

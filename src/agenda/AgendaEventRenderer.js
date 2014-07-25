@@ -577,9 +577,9 @@ function AgendaEventRenderer() {
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				
-				var inDroppableZone = authorizedToDrop(finalTimeEvent(dayDelta, minuteDelta));
+				var inDropZone = authorizedToDrop(finalTimeEvent(dayDelta, minuteDelta));
 
-				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDroppableZone) { // changed!
+				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDropZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
 				}
 				else { // either no change or out-of-bounds (draggable has already reverted)

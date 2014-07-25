@@ -43,7 +43,7 @@ function AgendaView(element, calendar, viewName) {
 	t.colContentRight = colContentRight;
 	t.getDaySegmentContainer = function() { return daySegmentContainer };
 	t.getSlotSegmentContainer = function() { return slotSegmentContainer };
-	t.getDroppableZoneSegmentContainer = function() { return droppableZoneSegmentContainer };
+	t.getDropZoneSegmentContainer = function() { return dropZoneSegmentContainer };
 	t.getMinMinute = function() { return minMinute };
 	t.getMaxMinute = function() { return maxMinute };
 	t.getSlotContainer = function() { return slotContainer };
@@ -59,10 +59,10 @@ function AgendaView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
-	t.renderDroppableZones = renderDroppableZones;
-	t.clearDroppableZones = clearDroppableZones;
-	t.renderUndroppableZones = renderUndroppableZones;
-	t.clearUndroppableZones = clearUndroppableZones;
+	t.renderDropZones = renderDropZones;
+	t.clearDropZones = clearDropZones;
+	t.renderSealedZones = renderSealedZones;
+	t.clearSealedZones = clearSealedZones;
 	
 	// imports
 	View.call(t, element, calendar, viewName);
@@ -241,11 +241,11 @@ function AgendaView(element, calendar, viewName) {
 			$("<div class='fc-event-container' style='position:absolute;z-index:8;top:0;left:0'/>")
 				.appendTo(slotContainer);
 		
-		droppableZoneSegmentContainer =
+		dropZoneSegmentContainer =
 			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
 				.appendTo(slotContainer);
 
-		undroppableZoneSegmentContainer =
+		sealedZoneSegmentContainer =
 			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
 				.appendTo(slotContainer);
 		
@@ -626,12 +626,12 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	
-	/* Render droppable slots
+	/* Render drop slots
 	-----------------------------------------------------------------------------*/
-	function renderDroppableZones(droppableZones) {
+	function renderDropZones(dropZones) {
 		var html = '';
-		for (i=0; i < droppableZones.length; i++) {
-			var zone = droppableZones[i];
+		for (i=0; i < dropZones.length; i++) {
+			var zone = dropZones[i];
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -649,13 +649,13 @@ function AgendaView(element, calendar, viewName) {
 				html += getZoneHtml(zone, start, end);
 			}
 		}
-		droppableZoneSegmentContainer[0].innerHTML = html;
+		dropZoneSegmentContainer[0].innerHTML = html;
 	}
 	
-	function renderUndroppableZones(undroppableZones) {
+	function renderSealedZones(sealedZones) {
 		var html = '';
-		for (i=0; i < undroppableZones.length; i++) {
-			var zone = undroppableZones[i];
+		for (i=0; i < sealedZones.length; i++) {
+			var zone = sealedZones[i];
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -673,7 +673,7 @@ function AgendaView(element, calendar, viewName) {
 				html += getZoneHtml(zone, start, end);
 			}
 		}
-		undroppableZoneSegmentContainer[0].innerHTML = html;
+		sealedZoneSegmentContainer[0].innerHTML = html;
 	}
 	
 	function getZoneHtml(zone, start, end) {
@@ -709,18 +709,18 @@ function AgendaView(element, calendar, viewName) {
 			'left: ' + left + 'px; ' +
 			'width: ' + width + 'px; ' +
 			'height: ' + height + 'px;' + background + '" ' + 
-			'class="fc-droppable-zone' + cls + '">' + 
+			'class="fc-drop-zone' + cls + '">' + 
 			'</div>';
 		
 	}
 	
 	
-	function clearDroppableZones() {
-	    droppableZoneSegmentContainer[0].innerHTML = '';
+	function clearDropZones() {
+	    dropZoneSegmentContainer[0].innerHTML = '';
 	}
 	
-	function clearUndroppableZones() {
-	    undroppableZoneSegmentContainer[0].innerHTML = '';
+	function clearSealedZones() {
+	    sealedZoneSegmentContainer[0].innerHTML = '';
 	}
 	
 	/* Coordinate Utilities
