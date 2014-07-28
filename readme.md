@@ -13,7 +13,7 @@ As soon as you give a drop zone, the event of the fullcalendar can only be dropp
 A sealed zone is a zone where you will never be able to drop something.
 A sealed zone can be placed in a drop zone.
 
-You can visit the demo pages on [dropZones][https://github.com/carpediese/fullcalendar/blob/master/demos/dropping-retriction.html] and [sealedZones only][https://github.com/carpediese/fullcalendar/blob/master/demos/sealed-zones.html].
+You can visit the demo pages on [dropZones](https://github.com/carpediese/fullcalendar/blob/master/demos/dropping-retriction.html) and [sealedZones only](https://github.com/carpediese/fullcalendar/blob/master/demos/sealed-zones.html).
 
 The zones works only in agenda views.
 
