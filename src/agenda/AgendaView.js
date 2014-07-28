@@ -639,7 +639,6 @@ function AgendaView(element, calendar, viewName) {
 			if (zone.weekly) {
 				var diff = dayDiff(t.visStart, start);
 				var weekDiff = diff - (diff % 7) ;
-				weekDiff = (diff > 0) ? weekDiff+7 : weekDiff ;
 				
 				start = addDays( start, weekDiff, true);
 				end = addDays( end, weekDiff, true);
@@ -663,7 +662,6 @@ function AgendaView(element, calendar, viewName) {
 			if (zone.weekly) {
 				var diff = dayDiff(t.visStart, start);
 				var weekDiff = diff - (diff % 7) ;
-				weekDiff = (diff > 0) ? weekDiff+7 : weekDiff ;
 				
 				start = addDays( start, weekDiff, true);
 				end = addDays( end, weekDiff, true);
