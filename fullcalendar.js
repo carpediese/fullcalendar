@@ -87,6 +87,8 @@ var defaults = {
 	unselectAuto: true,
 	
 	dropAccept: '*',
+	dropZones : [],
+	sealedZones : [],
 	
 	handleWindowResize: true
 	
@@ -213,7 +215,9 @@ function Calendar(element, options, eventSources) {
 	t.getView = getView;
 	t.option = option;
 	t.trigger = trigger;
-	
+	t.isInDropZone = isInDropZone;
+	t.isInSealedZone = isInSealedZone;
+	t.authorizedToDrop = authorizedToDrop;
 	
 	// imports
 	EventManager.call(t, options, eventSources);
@@ -235,8 +239,8 @@ function Calendar(element, options, eventSources) {
 	var date = new Date();
 	var events = [];
 	var _dragElement;
-	
-	
+	var dropZones = t.options.dropZones;
+	var sealedZones = t.options.sealedZones;
 	
 	/* Main Rendering
 	-----------------------------------------------------------------------------*/
@@ -496,6 +500,8 @@ function Calendar(element, options, eventSources) {
 		if (elementVisible()) {
 			currentView.setEventData(events); // for View.js, TODO: unify with renderEvents
 			currentView.renderEvents(events, modifiedEventID); // actually render the DOM elements
+			currentView.renderDropZones(dropZones);
+			currentView.renderSealedZones(sealedZones);
 			currentView.trigger('eventAfterAllRender');
 		}
 	}
@@ -505,6 +511,8 @@ function Calendar(element, options, eventSources) {
 		currentView.triggerEventDestroy(); // trigger 'eventDestroy' for each event
 		currentView.clearEvents(); // actually remove the DOM elements
 		currentView.clearEventData(); // for View.js, TODO: unify with clearEvents
+		currentView.clearDropZones();
+		currentView.clearSealedZones();
 	}
 	
 
@@ -691,7 +699,84 @@ function Calendar(element, options, eventSources) {
 		}
 	}
 	
+	function authorizedToDrop(event) {
+		return isInDropZone(event) && !isInSealedZone(event) ;
+	}
 	
+	function isInDropZone(event) {
+		
+		if (dropZones.length > 0) {
+			
+			var start = event.start;
+			var end = event.end;
+			if (!end) {
+				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
+			}
+			
+			for (var i = 0; i < dropZones.length; i++) {
+				
+				var zone = dropZones[i];
+				var zoneStart = cloneDate(zone.start);
+				var zoneEnd = cloneDate(zone.end);
+				
+				if (zone.weekly) {
+					var diff = dayDiff(start, zoneStart);
+					var weekDiff = diff - (diff % 7) ;
+					
+					zoneStart = addDays( zoneStart, weekDiff, true);
+					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					start >= zoneStart &&
+					start <= zoneEnd &&
+					end >= zoneStart &&
+					end <= zoneEnd
+				) {
+					return true ;
+				}
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	function isInSealedZone(event) {
+		
+		if (sealedZones.length > 0) {
+			
+			var start = event.start;
+			var end = event.end;
+			if (!end) {
+				end = addMinutes(cloneDate(event.start), t.options.defaultEventMinutes);
+			}
+			
+			for (var i = 0; i < sealedZones.length; i++) {
+				
+				var zone = sealedZones[i];
+				var zoneStart = cloneDate(zone.start);
+				var zoneEnd = cloneDate(zone.end);
+				
+				if (zone.weekly) {
+					var diff = dayDiff(start, zoneStart);
+					var weekDiff = diff - (diff % 7) ;
+			
+					zoneStart = addDays( zoneStart, weekDiff, true);
+					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					(start >= zoneStart && start < zoneEnd)  ||
+					(end > zoneStart && end <= zoneEnd) ||
+					(start <= zoneStart && end >= zoneEnd)
+				) {
+					return true ;
+				}
+			}
+		}
+		return false;
+	}
 	
 	/* External Dragging
 	------------------------------------------------------------------------*/
@@ -2136,6 +2221,8 @@ function BasicView(element, calendar, viewName) {
 	t.getColCnt = function() { return colCnt };
 	t.getColWidth = function() { return colWidth };
 	t.getDaySegmentContainer = function() { return daySegmentContainer };
+	t.renderDroppableZones = function(){};
+	t.clearDroppableZones = function(){};
 	
 	
 	// imports
@@ -2795,6 +2882,7 @@ function AgendaView(element, calendar, viewName) {
 	t.colContentRight = colContentRight;
 	t.getDaySegmentContainer = function() { return daySegmentContainer };
 	t.getSlotSegmentContainer = function() { return slotSegmentContainer };
+	t.getDropZoneSegmentContainer = function() { return dropZoneSegmentContainer };
 	t.getMinMinute = function() { return minMinute };
 	t.getMaxMinute = function() { return maxMinute };
 	t.getSlotContainer = function() { return slotContainer };
@@ -2810,7 +2898,10 @@ function AgendaView(element, calendar, viewName) {
 	t.reportDayClick = reportDayClick; // selection mousedown hack
 	t.dragStart = dragStart;
 	t.dragStop = dragStop;
-	
+	t.renderDropZones = renderDropZones;
+	t.clearDropZones = clearDropZones;
+	t.renderSealedZones = renderSealedZones;
+	t.clearSealedZones = clearSealedZones;
 	
 	// imports
 	View.call(t, element, calendar, viewName);
@@ -2987,6 +3078,14 @@ function AgendaView(element, calendar, viewName) {
 				
 		slotSegmentContainer =
 			$("<div class='fc-event-container' style='position:absolute;z-index:8;top:0;left:0'/>")
+				.appendTo(slotContainer);
+		
+		dropZoneSegmentContainer =
+			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
+				.appendTo(slotContainer);
+
+		sealedZoneSegmentContainer =
+			$("<div style='position:absolute;z-index:-1;top:0;left:0'/>")
 				.appendTo(slotContainer);
 		
 		s =
@@ -3366,6 +3465,101 @@ function AgendaView(element, calendar, viewName) {
 	
 	
 	
+	/* Render drop slots
+	-----------------------------------------------------------------------------*/
+	function renderDropZones(dropZones) {
+		var html = '';
+		for (i=0; i < dropZones.length; i++) {
+			var zone = dropZones[i];
+			
+			var start = cloneDate(zone.start);
+			var end = cloneDate(zone.end);
+			
+			if (zone.weekly) {
+				var diff = dayDiff(t.visStart, start);
+				var weekDiff = diff - (diff % 7) ;
+				
+				start = addDays( start, weekDiff, true);
+				end = addDays( end, weekDiff, true);
+			}
+
+			if (start >= this.start && end <= this.end) {
+				html += getZoneHtml(zone, start, end);
+			}
+		}
+		dropZoneSegmentContainer[0].innerHTML = html;
+	}
+	
+	function renderSealedZones(sealedZones) {
+		var html = '';
+		for (i=0; i < sealedZones.length; i++) {
+			var zone = sealedZones[i];
+			
+			var start = cloneDate(zone.start);
+			var end = cloneDate(zone.end);
+			
+			if (zone.weekly) {
+				var diff = dayDiff(t.visStart, start);
+				var weekDiff = diff - (diff % 7) ;
+				
+				start = addDays( start, weekDiff, true);
+				end = addDays( end, weekDiff, true);
+			}
+
+			if (start >= this.start && end <= this.end) {
+				html += getZoneHtml(zone, start, end);
+			}
+		}
+		sealedZoneSegmentContainer[0].innerHTML = html;
+	}
+	
+	function getZoneHtml(zone, start, end) {
+		
+		if (!start) {
+			start = zone.start;
+		}
+		if (!end) {
+			end = zone.end;
+		}
+		
+		var top = timePosition(start, start);
+		var bottom = timePosition(end, end);
+		var height = bottom - top;
+		var dayIndex = dayDiff(start, t.visStart);
+		
+		var left = colContentLeft(dayIndex) - 2;
+		var right = colContentRight(dayIndex) + 3;
+		var width = right - left;
+
+		var cls = '';
+		if (zone.cls) {
+			cls = ' ' + zone.cls;
+		}
+
+		var background = 'background: #aaeeaa ;';
+		if (zone.background) {
+			background = 'background:' + zone.background + ';';
+		}
+		
+		return '<div style="position: absolute; ' + 
+			'top: ' + top + 'px; ' + 
+			'left: ' + left + 'px; ' +
+			'width: ' + width + 'px; ' +
+			'height: ' + height + 'px;' + background + '" ' + 
+			'class="fc-drop-zone' + cls + '">' + 
+			'</div>';
+		
+	}
+	
+	
+	function clearDropZones() {
+	    dropZoneSegmentContainer[0].innerHTML = '';
+	}
+	
+	function clearSealedZones() {
+	    sealedZoneSegmentContainer[0].innerHTML = '';
+	}
+	
 	/* Coordinate Utilities
 	-----------------------------------------------------------------------------*/
 	
@@ -3692,7 +3886,7 @@ function AgendaEventRenderer() {
 	var calendar = t.calendar;
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
-
+	var authorizedToDrop = calendar.authorizedToDrop;
 
 	// overrides
 	t.draggableDayEvent = draggableDayEvent;
@@ -4176,11 +4370,15 @@ function AgendaEventRenderer() {
 				// update states
 				isInBounds = !!cell;
 				if (isInBounds) {
+					
+					// IN THE CALENDAR
+					
 					isAllDay = getIsCellAllDay(cell);
 
 					// calculate column delta
 					colDelta = Math.round((ui.position.left - origPosition.left) / colWidth);
 					if (colDelta != prevColDelta) {
+						
 						// calculate the day delta based off of the original clicked column and the column delta
 						var origDate = cellToDate(0, origCell.col);
 						var col = origCell.col + colDelta;
@@ -4203,7 +4401,6 @@ function AgendaEventRenderer() {
 					colDelta != prevColDelta ||
 					minuteDelta != prevMinuteDelta
 				) {
-
 					updateUI();
 
 					// update previous states for next time
@@ -4221,8 +4418,10 @@ function AgendaEventRenderer() {
 
 				clearOverlays();
 				trigger('eventDragStop', eventElement, event, ev, ui);
+				
+				var inDropZone = authorizedToDrop(finalTimeEvent(dayDelta, minuteDelta));
 
-				if (isInBounds && (isAllDay || dayDelta || minuteDelta)) { // changed!
+				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDropZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
 				}
 				else { // either no change or out-of-bounds (draggable has already reverted)
@@ -4274,10 +4473,14 @@ function AgendaEventRenderer() {
 			}
 			timeElement.text(formatDates(newStart, newEnd, opt('timeFormat')));
 		}
-
+		
+		function finalTimeEvent(dayDelta, minuteDelta) {
+			return {
+				start : addMinutes(addDays(cloneDate(event.start), dayDelta, true), minuteDelta),
+				end : 	addMinutes(addDays(slotEventEnd(event), dayDelta, true), minuteDelta)
+			};
+		}
 	}
-	
-	
 	
 	/* Resizing
 	--------------------------------------------------------------------------------------*/
@@ -6076,6 +6279,7 @@ function _fixUIEvent(event) { // for issue 1168
 		event.pageY = event.originalEvent.pageY;
 	}
 }
+
 ;;
 
 function HorizontalPositionCache(getElement) {
