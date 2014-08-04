@@ -3471,6 +3471,7 @@ function AgendaView(element, calendar, viewName) {
 		var html = '';
 		for (i=0; i < dropZones.length; i++) {
 			var zone = dropZones[i];
+			zone.background = (zone.background) ? zone.background : '#bbeebb' ;
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -3510,6 +3511,8 @@ function AgendaView(element, calendar, viewName) {
 		var html = '';
 		for (i=0; i < sealedZones.length; i++) {
 			var zone = sealedZones[i];
+			
+			zone.background = (zone.background) ? zone.background : '#eebbbb' ;
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -3567,7 +3570,7 @@ function AgendaView(element, calendar, viewName) {
 			cls = ' ' + zone.cls;
 		}
 
-		var background = 'background: #aaeeaa ;';
+		var background = '';
 		if (zone.background) {
 			background = 'background:' + zone.background + ';';
 		}
@@ -3590,9 +3593,7 @@ function AgendaView(element, calendar, viewName) {
 	        
 	        var diff = end.getDate() - start.getDate();
 	        var dates = [];
-	        console.log('------');
-            console.log(start);
-            console.log(end);
+	        
 	        for (var i = 0; i <= diff; i++) {
 	            
 	            var tempStart, tempEnd;
@@ -3601,24 +3602,18 @@ function AgendaView(element, calendar, viewName) {
 	            } else {
 	                tempStart = cloneDate(start);
 	                tempStart.setDate(tempStart.getDate() + i);
-	                tempStart.setHours(0);
-	                tempStart.setMinutes(0);
-	                tempStart.setSeconds(0);
+	                tempStart = clearTime(tempStart);
 	            }
 	            
                 if ( i == diff ) {
 	                tempEnd = end;
 	            } else {
-	                console.log('*');
-	                tempEnd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i, 23, 59, 59, 0);
-	                console.log(i);
-	                console.log(start.getDate());
-	                console.log(new Date(start));
-	                console.log(new Date(tempEnd));
-	                console.log('* - *');
+	                tempEnd = new Date(
+	                    start.getFullYear(), 
+	                    start.getMonth(),
+	                    start.getDate() + i, 
+	                    23, 59, 59, 0);
 	            }
-	            console.log(tempStart);
-                console.log(tempEnd);
 	            dates.push({start: tempStart, end:tempEnd});
 	        }
 	        return dates;
