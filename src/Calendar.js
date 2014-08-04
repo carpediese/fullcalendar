@@ -31,6 +31,8 @@ function Calendar(element, options, eventSources) {
 	t.isInDropZone = isInDropZone;
 	t.isInSealedZone = isInSealedZone;
 	t.authorizedToDrop = authorizedToDrop;
+	t.addDropzones = addDropzones;
+	t.addSealedZones = addSealedZones;
 	
 	// imports
 	EventManager.call(t, options, eventSources);
@@ -589,6 +591,18 @@ function Calendar(element, options, eventSources) {
 			}
 		}
 		return false;
+	}
+	
+	function addDropzones (newDropzones) {
+	    dropZones = dropZones.concat(newDropzones);
+	    currentView.claerDropZones();
+	    currentView.renderDropZones(dropZones);
+	}
+	
+	function addSealedZones( newSealedZones ) {
+	    sealedZones = sealedZones.concat(newSealedZones);
+	    currentView.clearSealedZones();
+	    currentView.renderSealedZones(sealedZones);
 	}
 	
 	/* External Dragging

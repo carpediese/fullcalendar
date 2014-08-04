@@ -632,7 +632,8 @@ function AgendaView(element, calendar, viewName) {
 		var html = '';
 		for (i=0; i < dropZones.length; i++) {
 			var zone = dropZones[i];
-			zone.background = (zone.background) ? zone.background : '#bbeebb' ;
+			zone.background = (zone.background != undefined) ? zone.background : '#bbeebb' ;
+			zone.cls = (zone.cls) ? zone.cls : 'fc-dropZone' ;
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -673,7 +674,8 @@ function AgendaView(element, calendar, viewName) {
 		for (i=0; i < sealedZones.length; i++) {
 			var zone = sealedZones[i];
 			
-			zone.background = (zone.background) ? zone.background : '#eebbbb' ;
+			zone.background = (zone.background != undefined) ? zone.background : '#eebbbb' ;
+			zone.cls = (zone.cls) ? zone.cls : 'fc-sealedZone' ;
 			
 			var start = cloneDate(zone.start);
 			var end = cloneDate(zone.end);
@@ -723,14 +725,9 @@ function AgendaView(element, calendar, viewName) {
 		var dayIndex = dayDiff(start, t.visStart);
 		
 		var left = colContentLeft(dayIndex) - 2;
-		var right = colContentRight(dayIndex) + 3;
+		var right = colContentRight(dayIndex) + 2;
 		var width = right - left;
         
-		var cls = '';
-		if (zone.cls) {
-			cls = ' ' + zone.cls;
-		}
-
 		var background = '';
 		if (zone.background) {
 			background = 'background:' + zone.background + ';';
@@ -741,7 +738,7 @@ function AgendaView(element, calendar, viewName) {
 			'left: ' + left + 'px; ' +
 			'width: ' + width + 'px; ' +
 			'height: ' + height + 'px;' + background + '" ' + 
-			'class="fc-drop-zone' + cls + '">' + 
+			'class="' + zone.cls + '">' + 
 			'</div>';
 		
 	}
