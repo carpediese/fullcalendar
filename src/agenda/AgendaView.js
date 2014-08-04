@@ -669,11 +669,20 @@ function AgendaView(element, calendar, viewName) {
 			var end = cloneDate(zone.end);
 			
 			if (zone.weekly) {
-				var diff = dayDiff(t.visStart, start);
-				var weekDiff = diff - (diff % 7) ;
+				var diff = start.getDay() - t.visStart.getDay() ;
+				diff = (diff < 0) ? diff + 7 : diff;
 				
-				start = addDays( start, weekDiff, true);
-				end = addDays( end, weekDiff, true);
+				var newStart = cloneDate(t.visStart);
+				newStart.setDate(newStart.getDate() + diff); 
+				newStart.setHours(start.getHours());
+				newStart.setMinutes(start.getMinutes());
+				start = newStart;
+				
+				var newEnd = cloneDate(t.visStart);
+				newEnd.setDate(newEnd.getDate() + diff); 
+				newEnd.setHours(end.getHours());
+				newEnd.setMinutes(end.getMinutes());
+				end = newEnd;
 			}
 
 			if (start >= this.start && end <= this.end) {
