@@ -3491,9 +3491,16 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
-
-			if (start >= this.start && end <= this.end) {
-				html += getZoneHtml(zone, start, end);
+            
+            var finalDates = splitMultipleDayZone(start, end);
+            
+            for (j in finalDates) {
+                
+                start = finalDates[j].start;
+                end = finalDates[j].end;
+			    if (start >= this.start && end <= this.end) {
+				    html += getZoneHtml(zone, start, end);
+			    }
 			}
 		}
 		dropZoneSegmentContainer[0].innerHTML = html;
@@ -3523,9 +3530,15 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
-
-			if (start >= this.start && end <= this.end) {
-				html += getZoneHtml(zone, start, end);
+            
+			var finalDates = splitMultipleDayZone(start, end);
+            for (j in finalDates) {
+                
+                start = finalDates[j].start;
+                end = finalDates[j].end;
+			    if (start >= this.start && end <= this.end) {
+				    html += getZoneHtml(zone, start, end);
+			    }
 			}
 		}
 		sealedZoneSegmentContainer[0].innerHTML = html;
@@ -3548,7 +3561,7 @@ function AgendaView(element, calendar, viewName) {
 		var left = colContentLeft(dayIndex) - 2;
 		var right = colContentRight(dayIndex) + 3;
 		var width = right - left;
-
+        
 		var cls = '';
 		if (zone.cls) {
 			cls = ' ' + zone.cls;
@@ -3568,6 +3581,51 @@ function AgendaView(element, calendar, viewName) {
 			'</div>';
 		
 	}
+	
+	function splitMultipleDayZone( start, end ) {
+	    
+	    if (start.getDate() == end.getDate()) {
+	        return [{start: start, end: end}];
+	    } else {
+	        
+	        var diff = end.getDate() - start.getDate();
+	        var dates = [];
+	        console.log('------');
+            console.log(start);
+            console.log(end);
+	        for (var i = 0; i <= diff; i++) {
+	            
+	            var tempStart, tempEnd;
+	            if( i == 0 ) {
+	                tempStart = start;
+	            } else {
+	                tempStart = cloneDate(start);
+	                tempStart.setDate(tempStart.getDate() + i);
+	                tempStart.setHours(0);
+	                tempStart.setMinutes(0);
+	                tempStart.setSeconds(0);
+	            }
+	            
+                if ( i == diff ) {
+	                tempEnd = end;
+	            } else {
+	                console.log('*');
+	                tempEnd = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i, 23, 59, 59, 0);
+	                console.log(i);
+	                console.log(start.getDate());
+	                console.log(new Date(start));
+	                console.log(new Date(tempEnd));
+	                console.log('* - *');
+	            }
+	            console.log(tempStart);
+                console.log(tempEnd);
+	            dates.push({start: tempStart, end:tempEnd});
+	        }
+	        return dates;
+	    }
+	}
+	
+	
 	
 	
 	function clearDropZones() {

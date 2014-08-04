@@ -652,9 +652,16 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
-
-			if (start >= this.start && end <= this.end) {
-				html += getZoneHtml(zone, start, end);
+            
+            var finalDates = splitMultipleDayZone(start, end);
+            
+            for (j in finalDates) {
+                
+                start = finalDates[j].start;
+                end = finalDates[j].end;
+			    if (start >= this.start && end <= this.end) {
+				    html += getZoneHtml(zone, start, end);
+			    }
 			}
 		}
 		dropZoneSegmentContainer[0].innerHTML = html;
@@ -684,9 +691,15 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
-
-			if (start >= this.start && end <= this.end) {
-				html += getZoneHtml(zone, start, end);
+            
+			var finalDates = splitMultipleDayZone(start, end);
+            for (j in finalDates) {
+                
+                start = finalDates[j].start;
+                end = finalDates[j].end;
+			    if (start >= this.start && end <= this.end) {
+				    html += getZoneHtml(zone, start, end);
+			    }
 			}
 		}
 		sealedZoneSegmentContainer[0].innerHTML = html;
@@ -709,7 +722,7 @@ function AgendaView(element, calendar, viewName) {
 		var left = colContentLeft(dayIndex) - 2;
 		var right = colContentRight(dayIndex) + 3;
 		var width = right - left;
-
+        
 		var cls = '';
 		if (zone.cls) {
 			cls = ' ' + zone.cls;
@@ -729,6 +742,43 @@ function AgendaView(element, calendar, viewName) {
 			'</div>';
 		
 	}
+	
+	function splitMultipleDayZone( start, end ) {
+	    
+	    if (start.getDate() == end.getDate()) {
+	        return [{start: start, end: end}];
+	    } else {
+	        
+	        var diff = end.getDate() - start.getDate();
+	        var dates = [];
+	        
+	        for (var i = 0; i <= diff; i++) {
+	            
+	            var tempStart, tempEnd;
+	            if( i == 0 ) {
+	                tempStart = start;
+	            } else {
+	                tempStart = cloneDate(start);
+	                tempStart.setDate(tempStart.getDate() + i);
+	                tempStart = clearTime(tempStart);
+	            }
+	            
+                if ( i == diff ) {
+	                tempEnd = end;
+	            } else {
+	                tempEnd = new Date(
+	                    start.getFullYear(), 
+	                    start.getMonth(),
+	                    start.getDate() + i, 
+	                    23, 59, 59, 0);
+	            }
+	            dates.push({start: tempStart, end:tempEnd});
+	        }
+	        return dates;
+	    }
+	}
+	
+	
 	
 	
 	function clearDropZones() {
