@@ -3586,12 +3586,23 @@ function AgendaView(element, calendar, viewName) {
 			background = 'background:' + zone.background + ';';
 		}
 		
+		console.log('-');
+		var cls = zone.cls;
+		if (dayDiff(clearTime(cloneDate(start)), clearTime(new Date())) == 0) {
+		    cls = (zone.cls) ? zone.cls + ' fc-today' : 'fc-today' ;
+		    console.log(cls);
+		} else {
+		    console.log(clearTime(cloneDate(start)));
+		    console.log(clearTime(new Date()));
+		}
+		console.log('-');
+		
 		return '<div style="position: absolute; ' + 
 			'top: ' + top + 'px; ' + 
 			'left: ' + left + 'px; ' +
 			'width: ' + width + 'px; ' +
 			'height: ' + height + 'px;' + background + '" ' + 
-			'class="' + zone.cls + '">' + 
+			'class="' + cls + '">' + 
 			'</div>';
 		
 	}
