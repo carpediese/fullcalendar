@@ -730,6 +730,13 @@ function Calendar(element, options, eventSources) {
 				}
 				
 				if (
+					zoneEnd < new Date() && zone.preventPast || 
+					event.start < new Date() && zone.preventPast 
+				) {
+					continue;
+				}
+				
+				if (
 					start >= zoneStart &&
 					start <= zoneEnd &&
 					end >= zoneStart &&
@@ -766,6 +773,13 @@ function Calendar(element, options, eventSources) {
 			
 					zoneStart = addDays( zoneStart, weekDiff, true);
 					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					zoneEnd < new Date() && zone.preventPast || 
+					event.start < new Date() && zone.preventPast 
+				) {
+					continue;
 				}
 				
 				if (
@@ -3507,6 +3521,8 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
+            if( end < new Date() && zone.preventPast )
+            	continue;
             
             var finalDates = splitMultipleDayZone(start, end);
             
@@ -3550,6 +3566,9 @@ function AgendaView(element, calendar, viewName) {
 				end = newEnd;
 			}
             
+            if( end < new Date() && zone.preventPast )
+            	continue;
+            
 			var finalDates = splitMultipleDayZone(start, end);
             for (j in finalDates) {
                 
@@ -3586,16 +3605,10 @@ function AgendaView(element, calendar, viewName) {
 			background = 'background:' + zone.background + ';';
 		}
 		
-		console.log('-');
 		var cls = zone.cls;
 		if (dayDiff(clearTime(cloneDate(start)), clearTime(new Date())) == 0) {
 		    cls = (zone.cls) ? zone.cls + ' fc-today' : 'fc-today' ;
-		    console.log(cls);
-		} else {
-		    console.log(clearTime(cloneDate(start)));
-		    console.log(clearTime(new Date()));
 		}
-		console.log('-');
 		
 		return '<div style="position: absolute; ' + 
 			'top: ' + top + 'px; ' + 

@@ -654,6 +654,8 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
+            if( end < new Date() && zone.preventPast )
+            	continue;
             
             var finalDates = splitMultipleDayZone(start, end);
             
@@ -696,6 +698,9 @@ function AgendaView(element, calendar, viewName) {
 				newEnd.setMinutes(end.getMinutes());
 				end = newEnd;
 			}
+            
+            if( end < new Date() && zone.preventPast )
+            	continue;
             
 			var finalDates = splitMultipleDayZone(start, end);
             for (j in finalDates) {

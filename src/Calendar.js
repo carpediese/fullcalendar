@@ -543,6 +543,13 @@ function Calendar(element, options, eventSources) {
 				}
 				
 				if (
+					zoneEnd < new Date() && zone.preventPast || 
+					event.start < new Date() && zone.preventPast 
+				) {
+					continue;
+				}
+				
+				if (
 					start >= zoneStart &&
 					start <= zoneEnd &&
 					end >= zoneStart &&
@@ -579,6 +586,13 @@ function Calendar(element, options, eventSources) {
 			
 					zoneStart = addDays( zoneStart, weekDiff, true);
 					zoneEnd = addDays( zoneEnd, weekDiff, true);
+				}
+				
+				if (
+					zoneEnd < new Date() && zone.preventPast || 
+					event.start < new Date() && zone.preventPast 
+				) {
+					continue;
 				}
 				
 				if (
