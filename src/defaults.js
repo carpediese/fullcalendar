@@ -71,8 +71,9 @@ var defaults = {
 	unselectAuto: true,
 	
 	dropAccept: '*',
-	dropZones : [],
-	sealedZones : [],
+	dropZones: [],
+	sealedZones: [],
+	allowDropEverywhere: false,
 	
 	handleWindowResize: true
 	
