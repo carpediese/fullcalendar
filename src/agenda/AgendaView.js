@@ -759,7 +759,7 @@ function AgendaView(element, calendar, viewName) {
 	        return [{start: start, end: end}];
 	    } else {
 	        
-	        var diff = end.getDate() - start.getDate();
+	        var diff = (end - start)/(3600*24*1000);
 	        var dates = [];
 	        
 	        for (var i = 0; i <= diff; i++) {

@@ -87,8 +87,9 @@ var defaults = {
 	unselectAuto: true,
 	
 	dropAccept: '*',
-	dropZones : [],
-	sealedZones : [],
+	dropZones: [],
+	sealedZones: [],
+	allowDropEverywhere: false,
 	
 	handleWindowResize: true
 	
@@ -3626,7 +3627,7 @@ function AgendaView(element, calendar, viewName) {
 	        return [{start: start, end: end}];
 	    } else {
 	        
-	        var diff = end.getDate() - start.getDate();
+	        var diff = (end - start)/(3600*24*1000);
 	        var dates = [];
 	        
 	        for (var i = 0; i <= diff; i++) {
@@ -3993,6 +3994,7 @@ function AgendaEventRenderer() {
 	var formatDate = calendar.formatDate;
 	var formatDates = calendar.formatDates;
 	var authorizedToDrop = calendar.authorizedToDrop;
+	var allowDropEverywhere = calendar.options.allowDropEverywhere;
 
 	// overrides
 	t.draggableDayEvent = draggableDayEvent;
@@ -4526,6 +4528,7 @@ function AgendaEventRenderer() {
 				trigger('eventDragStop', eventElement, event, ev, ui);
 				
 				var inDropZone = authorizedToDrop(finalTimeEvent(dayDelta, minuteDelta));
+				var inDropZone = inDropZone || allowDropEverywhere ;
 
 				if (isInBounds && (isAllDay || dayDelta || minuteDelta) && inDropZone) { // changed!
 					eventDrop(this, event, dayDelta, isAllDay ? 0 : minuteDelta, isAllDay, ev, ui);
